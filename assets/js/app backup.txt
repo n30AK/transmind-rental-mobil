@@ -1,0 +1,1080 @@
+const WA = '6281292677888';
+
+let sb = null;
+let vehiclesCache = [];
+
+/* =========================================================
+   FALLBACK ARMADA
+   Dipakai hanya jika Supabase gagal.
+   ========================================================= */
+
+const fallback = [
+    'Toyota Rocky',
+    'Toyota Avanza',
+    'Honda Brio',
+    'Toyota Avanza 2022',
+    'Toyota Veloz 2022',
+    'Honda Jazz',
+    'Toyota Rush',
+    'Mitsubishi Xpander Ultimate 2023',
+    'Honda City RS',
+    'Toyota Innova Reborn Bensin',
+    'Toyota Innova Reborn Diesel',
+    'Toyota Innova Zenix G Bensin',
+    'Toyota Innova Zenix Hybrid G',
+    'Honda HR-V',
+    'Toyota Innova Venturer',
+    'Honda CR-V',
+    'Toyota Fortuner',
+    'Mitsubishi Pajero',
+    'Toyota Innova Zenix Hybrid Q',
+    'Mitsubishi Pajero 4x4',
+    'Honda Accord',
+    'Hyundai Palisade',
+    'Hyundai Ioniq',
+    'BMW',
+    'Honda Civic RS',
+    'Toyota Alphard 2022',
+    'Toyota Alphard 2024',
+    'Toyota Vellfire',
+    'Mercedes-Benz E 300 AMG',
+    'Mercedes-Benz S 450 L',
+    'Toyota Land Cruiser VXR 2023',
+    'Toyota Hiace Premio Luxury',
+    'Toyota Hiace Premio',
+    'Isuzu ELF',
+    'Bus Medium',
+    'Big Bus'
+];
+
+
+/* =========================================================
+   CEK KONFIGURASI SUPABASE
+   ========================================================= */
+
+function configured() {
+
+    return Boolean(
+        window.TRANSMIND_SUPABASE_URL &&
+        window.TRANSMIND_SUPABASE_URL.startsWith('http') &&
+        window.TRANSMIND_SUPABASE_ANON_KEY &&
+        window.TRANSMIND_SUPABASE_ANON_KEY.length > 20
+    );
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+
+/* =========================================================
+   FORMAT RUPIAH
+   ========================================================= */
+
+function rupiah(value) {
+
+    return new Intl.NumberFormat(
+        'id-ID',
+        {
+            style: 'currency',
+            currency: 'IDR',
+            maximumFractionDigits: 0
+        }
+    ).format(Number(value || 0));
+}
+
+
+/* =========================================================
+   FALLBACK DATA
+   ========================================================= */
+
+function getFallbackVehicles() {
+
+    return fallback.map((name, index) => ({
+        id: `fallback-${index + 1}`,
+        name,
+        slug: name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, ''),
+        category: 'Armada',
+        capacity: 'Sesuai tipe kendaraan',
+        active: true
+    }));
+}
+
+
+/* =========================================================
+   PLACEHOLDER ARMADA
+   TIDAK MEMANGGIL FILE JPG LOKAL
+   ========================================================= */
+
+function createVehicleVisual(vehicle) {
+
+    const name =
+        escapeHtml(
+            vehicle.name || 'Kendaraan'
+        );
+
+    const category =
+        escapeHtml(
+            vehicle.category || 'Armada Transmind'
+        );
+
+    return `
+        <div class="photo vehicle-placeholder">
+            <div class="vehicle-placeholder-inner">
+                <strong>TRANSMIND</strong>
+                <span>${name}</span>
+                <small>${category}</small>
+            </div>
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   RENDER DROPDOWN KENDARAAN
+   ========================================================= */
+
+function renderVehicleSelect() {
+
+    const select =
+        document.getElementById('vehicle');
+
+    if (!select) {
+
+        console.warn(
+            'Elemen #vehicle tidak ditemukan.'
+        );
+
+        return;
+    }
+
+    select.innerHTML =
+        '<option value="">Pilih kendaraan</option>' +
+
+        vehiclesCache.map(vehicle => {
+
+            return `
+                <option value="${escapeHtml(vehicle.id || '')}">
+                    ${escapeHtml(vehicle.name || 'Kendaraan')}
+                </option>
+            `;
+
+        }).join('');
+}
+
+
+/* =========================================================
+   RENDER KARTU ARMADA
+   ========================================================= */
+
+function renderVehicleCards() {
+
+    const cars =
+        document.getElementById('cars');
+
+    if (!cars) {
+
+        console.error(
+            'Elemen #cars tidak ditemukan di HTML.'
+        );
+
+        return;
+    }
+
+    if (!vehiclesCache.length) {
+
+        cars.innerHTML = `
+            <div class="vehicle-empty">
+                Armada belum tersedia.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    cars.innerHTML =
+        vehiclesCache.map(vehicle => {
+
+            const id =
+                escapeHtml(
+                    vehicle.id || ''
+                );
+
+            const name =
+                escapeHtml(
+                    vehicle.name || 'Kendaraan'
+                );
+
+            const category =
+                escapeHtml(
+                    vehicle.category || 'Armada'
+                );
+
+            const capacity =
+                escapeHtml(
+                    vehicle.capacity ||
+                    'Sesuai tipe kendaraan'
+                );
+
+
+            return `
+                <article class="car">
+
+                    ${createVehicleVisual(vehicle)}
+
+                    <div class="ci">
+
+                        <b>${category}</b>
+
+                        <h3>
+                            ${name}
+                        </h3>
+
+                        <p>
+                            ${capacity}
+                            • Jabodetabek
+                        </p>
+
+                        <button
+                            type="button"
+                            onclick="selectVehicle('${id}')"
+                        >
+                            PILIH
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
+        }).join('');
+
+
+    /* Update jumlah Armada pada heading */
+
+    const armadaSection =
+        document.getElementById('armada');
+
+    if (armadaSection) {
+
+        const heading =
+            armadaSection.querySelector('h2');
+
+        if (heading) {
+
+            heading.textContent =
+                `${vehiclesCache.length} pilihan kendaraan.`;
+        }
+    }
+
+
+    console.log(
+        'Armada berhasil ditampilkan:',
+        vehiclesCache.length,
+        'kendaraan'
+    );
+}
+
+
+/* =========================================================
+   TAMPILKAN ARMADA
+   ========================================================= */
+
+function showCars(list) {
+
+    vehiclesCache =
+        Array.isArray(list)
+            ? list
+            : [];
+
+    renderVehicleSelect();
+    renderVehicleCards();
+
+    updateVehiclePriceMessage();
+}
+
+
+/* =========================================================
+   PILIH KENDARAAN
+   ========================================================= */
+
+function selectVehicle(vehicleId) {
+
+    const select =
+        document.getElementById('vehicle');
+
+    if (!select) {
+
+        console.error(
+            'Elemen #vehicle tidak ditemukan.'
+        );
+
+        return;
+    }
+
+
+    select.value = vehicleId;
+
+
+    if (select.value !== vehicleId) {
+
+        console.warn(
+            'Vehicle ID tidak ditemukan:',
+            vehicleId
+        );
+
+        return;
+    }
+
+
+    updateVehiclePriceMessage();
+
+    location.hash = 'booking';
+
+    select.focus();
+}
+
+
+/* =========================================================
+   INFORMASI KENDARAAN TERPILIH
+   Tidak mengambil harga karena tabel vehicles
+   saat ini belum memiliki kolom harga.
+   ========================================================= */
+
+function updateVehiclePriceMessage() {
+
+    const priceBox =
+        document.getElementById('vehiclePrice');
+
+    const select =
+        document.getElementById('vehicle');
+
+    if (!priceBox || !select) {
+        return;
+    }
+
+
+    const vehicleId =
+        select.value;
+
+
+    if (!vehicleId) {
+
+        priceBox.textContent =
+            'Pilih kendaraan untuk melihat informasi rental.';
+
+        return;
+    }
+
+
+    const vehicle =
+        vehiclesCache.find(
+            item =>
+                String(item.id) ===
+                String(vehicleId)
+        );
+
+
+    if (!vehicle) {
+
+        priceBox.textContent =
+            'Informasi kendaraan tidak ditemukan.';
+
+        return;
+    }
+
+
+    priceBox.textContent =
+        `${vehicle.name} • ${vehicle.category || 'Armada'} • ${vehicle.capacity || 'Sesuai tipe kendaraan'}`;
+}
+
+
+/* =========================================================
+   AMBIL ARMADA DARI SUPABASE
+   ========================================================= */
+
+async function loadVehicles() {
+
+    if (!configured()) {
+
+        console.warn(
+            'Supabase belum dikonfigurasi. Menggunakan fallback.'
+        );
+
+        showCars(
+            getFallbackVehicles()
+        );
+
+        return;
+    }
+
+
+    try {
+
+        sb =
+            window.supabase.createClient(
+                window.TRANSMIND_SUPABASE_URL,
+                window.TRANSMIND_SUPABASE_ANON_KEY
+            );
+
+
+        const {
+            data,
+            error
+        } = await sb
+            .from('vehicles')
+            .select(
+                'id,name,slug,category,capacity,active'
+            )
+            .eq('active', true)
+            .order('name', {
+                ascending: true
+            });
+
+
+        if (error) {
+
+            console.error(
+                'Gagal mengambil armada dari Supabase:',
+                error
+            );
+
+            showCars(
+                getFallbackVehicles()
+            );
+
+            return;
+        }
+
+
+        if (!Array.isArray(data) || !data.length) {
+
+            console.warn(
+                'Tidak ada armada aktif di database.'
+            );
+
+            showCars(
+                getFallbackVehicles()
+            );
+
+            return;
+        }
+
+
+        console.log(
+            'Armada berhasil dimuat:',
+            data
+        );
+
+
+        showCars(data);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'LOAD VEHICLES ERROR:',
+            error
+        );
+
+        showCars(
+            getFallbackVehicles()
+        );
+    }
+}
+
+
+/* =========================================================
+   AMBIL DATA FORM
+   ========================================================= */
+
+function getFormData() {
+
+    const vehicleSelect =
+        document.getElementById('vehicle');
+
+    const selectedOption =
+        vehicleSelect &&
+        vehicleSelect.options[
+            vehicleSelect.selectedIndex
+        ];
+
+
+    return {
+
+        name:
+            document.getElementById('name')
+                ?.value
+                .trim() || '',
+
+        phone:
+            document.getElementById('phone')
+                ?.value
+                .trim() || '',
+
+        vehicleId:
+            vehicleSelect
+                ? vehicleSelect.value.trim()
+                : '',
+
+        vehicleName:
+            selectedOption
+                ? selectedOption.textContent.trim()
+                : '',
+
+        service:
+            document.getElementById('service')
+                ?.value
+                .trim() || '',
+
+        start:
+            document.getElementById('start')
+                ?.value || '',
+
+        end:
+            document.getElementById('end')
+                ?.value || '',
+
+        area:
+            document.getElementById('area')
+                ?.value
+                .trim() || '',
+
+        notes:
+            document.getElementById('notes')
+                ?.value
+                .trim() || ''
+    };
+}
+
+
+/* =========================================================
+   VALIDASI KENDARAAN
+   ========================================================= */
+
+function validateVehicle(data, result) {
+
+    if (!data.vehicleId) {
+
+        result.textContent =
+            'Silakan pilih kendaraan terlebih dahulu.';
+
+        return false;
+    }
+
+
+    if (
+        data.vehicleId.startsWith('fallback-')
+    ) {
+
+        result.textContent =
+            'Daftar kendaraan belum terhubung ke database. Silakan refresh halaman.';
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* =========================================================
+   WHATSAPP - BOOKING BERHASIL
+   ========================================================= */
+
+function openSuccessWhatsApp(data, result) {
+
+    const code =
+        result.booking_code ||
+        'TRM-BOOKING';
+
+
+    const vehicleName =
+        result.vehicle_name ||
+        data.vehicleName;
+
+
+    const totalDays =
+        result.total_days ||
+        0;
+
+
+    const dailyPrice =
+        result.daily_price ||
+        0;
+
+
+    const totalPrice =
+        result.total_price ||
+        0;
+
+
+    const message =
+`Halo Transmind Nusantara, booking saya sudah dibuat.
+
+Kode Booking: ${code}
+
+Nama: ${data.name}
+WhatsApp: ${data.phone}
+Kendaraan: ${vehicleName}
+Layanan: ${data.service}
+
+Tanggal:
+${data.start} s/d ${data.end}
+
+Lama Sewa: ${totalDays} hari
+Harga/Hari: ${rupiah(dailyPrice)}
+Total Harga: ${rupiah(totalPrice)}
+
+Area: ${data.area}
+Catatan: ${data.notes || '-'}
+
+Mohon konfirmasi booking saya.
+
+Terima kasih.`;
+
+
+    window.open(
+        'https://wa.me/' +
+        WA +
+        '?text=' +
+        encodeURIComponent(message),
+        '_blank'
+    );
+}
+
+
+/* =========================================================
+   WHATSAPP - KENDARAAN TIDAK TERSEDIA
+   ========================================================= */
+
+function openUnavailableWhatsApp(
+    data,
+    messageText
+) {
+
+    const message =
+`Halo Transmind Nusantara.
+
+Saya ingin menyewa kendaraan, tetapi kendaraan yang saya pilih sedang tidak tersedia.
+
+Kendaraan: ${data.vehicleName}
+Layanan: ${data.service}
+
+Tanggal:
+${data.start} s/d ${data.end}
+
+Area: ${data.area}
+
+Keterangan sistem:
+${messageText}
+
+Mohon dibantu mencarikan kendaraan alternatif yang tersedia.
+
+Terima kasih.`;
+
+
+    window.open(
+        'https://wa.me/' +
+        WA +
+        '?text=' +
+        encodeURIComponent(message),
+        '_blank'
+    );
+}
+
+
+/* =========================================================
+   SUBMIT BOOKING
+   ========================================================= */
+
+async function submit(e) {
+
+    e.preventDefault();
+
+
+    const form =
+        e.target;
+
+
+    const resultBox =
+        document.getElementById('result');
+
+
+    if (!resultBox) {
+
+        console.error(
+            'Elemen #result tidak ditemukan.'
+        );
+
+        return;
+    }
+
+
+    resultBox.textContent =
+        'Memproses booking...';
+
+
+    const data =
+        getFormData();
+
+
+    /* -----------------------------------------------------
+       VALIDASI
+       ----------------------------------------------------- */
+
+    if (!validateVehicle(data, resultBox)) {
+        return;
+    }
+
+
+    if (!data.name) {
+
+        resultBox.textContent =
+            'Nama wajib diisi.';
+
+        return;
+    }
+
+
+    if (!data.phone) {
+
+        resultBox.textContent =
+            'Nomor WhatsApp wajib diisi.';
+
+        return;
+    }
+
+
+    if (!data.start || !data.end) {
+
+        resultBox.textContent =
+            'Tanggal booking wajib diisi.';
+
+        return;
+    }
+
+
+    if (data.end < data.start) {
+
+        resultBox.textContent =
+            'Tanggal selesai tidak boleh sebelum tanggal mulai.';
+
+        return;
+    }
+
+
+    if (!sb) {
+
+        resultBox.textContent =
+            'Database belum terhubung. Silakan refresh halaman.';
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       RPC CREATE BOOKING
+       ----------------------------------------------------- */
+
+    try {
+
+        const {
+            data: rpcData,
+            error
+        } = await sb.rpc(
+            'create_booking',
+            {
+                p_name:
+                    data.name,
+
+                p_phone:
+                    data.phone,
+
+                p_vehicle_id:
+                    data.vehicleId,
+
+                p_service:
+                    data.service,
+
+                p_start_date:
+                    data.start,
+
+                p_end_date:
+                    data.end,
+
+                p_area:
+                    data.area,
+
+                p_notes:
+                    data.notes
+            }
+        );
+
+
+        console.log(
+            'CREATE BOOKING RESULT:',
+            rpcData
+        );
+
+
+        if (error) {
+
+            console.error(
+                'CREATE BOOKING ERROR:',
+                error
+            );
+
+            resultBox.textContent =
+                'Terjadi kesalahan sistem: ' +
+                error.message;
+
+            return;
+        }
+
+
+        const result =
+            Array.isArray(rpcData)
+                ? rpcData[0]
+                : rpcData;
+
+
+        if (!result) {
+
+            resultBox.textContent =
+                'Sistem tidak menerima hasil booking dari database.';
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           BOOKING GAGAL
+           ------------------------------------------------- */
+
+        if (!result.success) {
+
+            const msg =
+                result.message ||
+                'Booking tidak dapat dibuat.';
+
+
+            resultBox.innerHTML =
+                `<b>${escapeHtml(msg)}</b>`;
+
+
+            if (
+                /tidak tersedia|sedang digunakan|seluruh unit/i
+                    .test(msg)
+            ) {
+
+                openUnavailableWhatsApp(
+                    data,
+                    msg
+                );
+            }
+
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           BOOKING BERHASIL
+           ------------------------------------------------- */
+
+        resultBox.innerHTML =
+            `Booking berhasil dibuat.<br>
+             <b>Kode: ${escapeHtml(
+                 result.booking_code || '-'
+             )}</b><br>
+             Kendaraan: ${escapeHtml(
+                 result.vehicle_name ||
+                 data.vehicleName
+             )}<br>
+             Lama sewa: ${
+                 result.total_days || 0
+             } hari<br>
+             Harga: ${rupiah(
+                 result.total_price || 0
+             )}`;
+
+
+        openSuccessWhatsApp(
+            data,
+            result
+        );
+
+
+        form.reset();
+
+
+        const vehicleSelect =
+            document.getElementById('vehicle');
+
+        if (vehicleSelect) {
+
+            vehicleSelect.selectedIndex = 0;
+        }
+
+
+        updateVehiclePriceMessage();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'SUBMIT ERROR:',
+            error
+        );
+
+        resultBox.textContent =
+            'Terjadi kesalahan: ' +
+            error.message;
+    }
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    async () => {
+
+        console.log(
+            'TRANSMIND APP START'
+        );
+
+
+        /* ---------------------------------------------
+           LOAD ARMADA
+           --------------------------------------------- */
+
+        await loadVehicles();
+
+
+        /* ---------------------------------------------
+           FORM BOOKING
+           --------------------------------------------- */
+
+        const form =
+            document.getElementById(
+                'bookingForm'
+            );
+
+
+        if (form) {
+
+            form.addEventListener(
+                'submit',
+                submit
+            );
+        }
+
+
+        /* ---------------------------------------------
+           VEHICLE CHANGE
+           --------------------------------------------- */
+
+        const vehicle =
+            document.getElementById(
+                'vehicle'
+            );
+
+
+        if (vehicle) {
+
+            vehicle.addEventListener(
+                'change',
+                updateVehiclePriceMessage
+            );
+        }
+
+
+        /* ---------------------------------------------
+           MINIMUM DATE = HARI INI
+           --------------------------------------------- */
+
+        const today =
+            new Date()
+                .toISOString()
+                .slice(0, 10);
+
+
+        const start =
+            document.getElementById(
+                'start'
+            );
+
+
+        const end =
+            document.getElementById(
+                'end'
+            );
+
+
+        if (start) {
+
+            start.min =
+                today;
+        }
+
+
+        if (end) {
+
+            end.min =
+                today;
+        }
+
+
+        /* ---------------------------------------------
+           START DATE BERUBAH
+           --------------------------------------------- */
+
+        if (start && end) {
+
+            start.addEventListener(
+                'change',
+                () => {
+
+                    end.min =
+                        start.value;
+
+
+                    if (
+                        end.value &&
+                        end.value < start.value
+                    ) {
+
+                        end.value =
+                            start.value;
+                    }
+                }
+            );
+        }
+
+
+        console.log(
+            'TRANSMIND APP READY'
+        );
+    }
+);
