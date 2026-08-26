@@ -1140,15 +1140,15 @@ Layanan: ${formData.service}
 Tanggal:
 ${formData.start} s/d ${formData.end}
 
-Lama Sewa: ${totalDays} hari
-Harga/Hari: ${rupiah(dailyPrice)}
-Total Harga: ${rupiah(totalPrice)}
 
 Area: ${formData.area}
 Catatan: ${formData.notes || '-'}
 
 Mohon konfirmasi booking saya.
-
+Pembayaran hanya melalui rekening dibawah ini
+BCA 
+PT TRANS MIND NUSANTARA
+NO. REK. 2308666722
 Terima kasih.
 
 `.trim();
