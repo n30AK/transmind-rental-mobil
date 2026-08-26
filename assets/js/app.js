@@ -1429,22 +1429,7 @@ async function submitBooking(
                 data.vehicleName
             )}
 
-            <br>
-
-            Lama sewa:
-            ${Number(
-                result.total_days ||
-                0
-            )}
-            hari
-
-            <br>
-
-            Total:
-            ${rupiah(
-                result.total_price
-            )}
-
+            
         `;
 
 
