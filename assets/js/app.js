@@ -132,11 +132,10 @@ function getVehicleImageCandidates(vehicle) {
 
     const candidates = [];
 
-    /*
-       ======================================================
-       NAMA KHUSUS YANG SUDAH ADA DI STORAGE
-       ======================================================
-    */
+
+    /* ======================================================
+       NAMA KHUSUS STORAGE
+       ====================================================== */
 
     const specialMap = {
 
@@ -184,11 +183,9 @@ function getVehicleImageCandidates(vehicle) {
     }
 
 
-    /*
-       ======================================================
-       FALLBACK BERDASARKAN SLUG DATABASE
-       ======================================================
-    */
+    /* ======================================================
+       FALLBACK SLUG
+       ====================================================== */
 
     if (slug) {
 
@@ -201,11 +198,9 @@ function getVehicleImageCandidates(vehicle) {
     }
 
 
-    /*
-       ======================================================
-       FALLBACK BERDASARKAN NAMA KENDARAAN
-       ======================================================
-    */
+    /* ======================================================
+       FALLBACK NAMA
+       ====================================================== */
 
     if (name) {
 
@@ -259,7 +254,7 @@ function getStoragePublicUrl(fileName) {
 
 
 /* =========================================================
-   AMBIL URL GAMBAR PERTAMA
+   AMBIL URL GAMBAR
    ========================================================= */
 
 function getVehicleImageUrl(vehicle) {
@@ -445,11 +440,9 @@ function showCars(list) {
         getElement('cars');
 
 
-    /*
-       ======================================================
+    /* ======================================================
        DROPDOWN BOOKING
-       ======================================================
-    */
+       ====================================================== */
 
     if (vehicleSelect) {
 
@@ -483,11 +476,9 @@ function showCars(list) {
     }
 
 
-    /*
-       ======================================================
+    /* ======================================================
        KARTU ARMADA
-       ======================================================
-    */
+       ====================================================== */
 
     if (!cars) {
         return;
@@ -634,11 +625,9 @@ function showCars(list) {
         ).join('');
 
 
-    /*
-       ======================================================
+    /* ======================================================
        EVENT TOMBOL PILIH
-       ======================================================
-    */
+       ====================================================== */
 
     cars
         .querySelectorAll(
@@ -1091,7 +1080,12 @@ function validateBooking(
 
 
 /* =========================================================
-   BUKA WHATSAPP BOOKING BERHASIL
+   WHATSAPP BOOKING BERHASIL
+   =========================================================
+   
+   PENTING:
+   Harga dan lama sewa SENGAJA tidak dimasukkan
+   ke dalam pesan WhatsApp.
    ========================================================= */
 
 function openSuccessWhatsApp(
@@ -1099,59 +1093,43 @@ function openSuccessWhatsApp(
     result
 ) {
 
+    if (Array.isArray(result)) {
+        result = result[0];
+    }
+
+
     const code =
-        result.booking_code ||
+        result?.booking_code ||
         'TRM-BOOKING';
 
 
     const vehicleName =
-        result.vehicle_name ||
-        formData.vehicleName;
+        result?.vehicle_name ||
+        formData?.vehicleName ||
+        '-';
 
 
-    const totalDays =
-        result.total_days ||
-        0;
-
-
-    const dailyPrice =
-        result.daily_price ||
-        0;
-
-
-    const totalPrice =
-        result.total_price ||
-        0;
-
-
-    const message = `
-
-Halo Transmind Nusantara,
+    const message = `Halo Transmind Nusantara,
 
 Booking saya sudah dibuat.
 
 Kode Booking: ${code}
 
-Nama: ${formData.name}
-WhatsApp: ${formData.phone}
+Nama: ${formData?.name || '-'}
+WhatsApp: ${formData?.phone || '-'}
+
 Kendaraan: ${vehicleName}
-Layanan: ${formData.service}
+Layanan: ${formData?.service || '-'}
 
 Tanggal:
-${formData.start} s/d ${formData.end}
+${formData?.start || '-'} s/d ${formData?.end || '-'}
 
-
-Area: ${formData.area}
-Catatan: ${formData.notes || '-'}
+Area: ${formData?.area || '-'}
+Catatan: ${formData?.notes || '-'}
 
 Mohon konfirmasi booking saya.
-Pembayaran hanya melalui rekening dibawah ini
-BCA 
-PT TRANS MIND NUSANTARA
-NO. REK. 2308666722
-Terima kasih.
 
-`.trim();
+Terima kasih.`;
 
 
     const url =
@@ -1163,19 +1141,26 @@ Terima kasih.
         );
 
 
-    /*
-       ======================================================
-       PENTING:
-       JANGAN window.open()
-       KARENA BOOKING SUDAH MELALUI ASYNC RPC.
-       ======================================================
-    */
+    console.log(
+        '=== WHATSAPP FINAL ==='
+    );
+
+    console.log(
+        message
+    );
+
 
     console.log(
         'Membuka WhatsApp:',
         url
     );
 
+
+    /*
+       ======================================================
+       BUKA WHATSAPP
+       ======================================================
+    */
 
     window.location.href =
         url;
@@ -1191,9 +1176,7 @@ function openUnavailableWhatsApp(
     messageText
 ) {
 
-    const message = `
-
-Halo Transmind Nusantara.
+    const message = `Halo Transmind Nusantara.
 
 Saya ingin menyewa kendaraan, tetapi kendaraan yang saya pilih sedang tidak tersedia.
 
@@ -1210,9 +1193,7 @@ ${messageText}
 
 Mohon dibantu mencarikan kendaraan alternatif yang tersedia.
 
-Terima kasih.
-
-`.trim();
+Terima kasih.`;
 
 
     const url =
@@ -1267,11 +1248,9 @@ async function submitBooking(
         getFormData();
 
 
-    /*
-       ======================================================
+    /* ======================================================
        VALIDASI
-       ======================================================
-    */
+       ====================================================== */
 
     if (
         !validateBooking(
@@ -1301,11 +1280,9 @@ async function submitBooking(
         );
 
 
-        /*
-           ==================================================
+        /* ==================================================
            RPC CREATE BOOKING
-           ==================================================
-        */
+           ================================================== */
 
         const {
             data: rpcData,
@@ -1348,11 +1325,9 @@ async function submitBooking(
         );
 
 
-        /*
-           ==================================================
+        /* ==================================================
            ERROR RPC
-           ==================================================
-        */
+           ================================================== */
 
         if (error) {
 
@@ -1371,11 +1346,9 @@ async function submitBooking(
         }
 
 
-        /*
-           ==================================================
+        /* ==================================================
            HASIL RPC
-           ==================================================
-        */
+           ================================================== */
 
         const result =
             Array.isArray(
@@ -1394,11 +1367,15 @@ async function submitBooking(
         }
 
 
-        /*
-           ==================================================
+        console.log(
+            'HASIL BOOKING FINAL:',
+            result
+        );
+
+
+        /* ==================================================
            BOOKING GAGAL
-           ==================================================
-        */
+           ================================================== */
 
         if (!result.success) {
 
@@ -1427,11 +1404,9 @@ async function submitBooking(
         }
 
 
-        /*
-           ==================================================
+        /* ==================================================
            BOOKING BERHASIL
-           ==================================================
-        */
+           ================================================== */
 
         resultBox.innerHTML = `
 
@@ -1473,11 +1448,12 @@ async function submitBooking(
         `;
 
 
-        /*
-           ==================================================
-           WHATSAPP
-           ==================================================
-        */
+        /* ==================================================
+           KIRIM KE WHATSAPP
+           
+           HARGA TIDAK DIKIRIM.
+           LAMA SEWA TIDAK DIKIRIM.
+           ================================================== */
 
         openSuccessWhatsApp(
             data,
@@ -1485,11 +1461,9 @@ async function submitBooking(
         );
 
 
-        /*
-           ==================================================
+        /* ==================================================
            RESET FORM
-           ==================================================
-        */
+           ================================================== */
 
         form.reset();
 
@@ -1531,11 +1505,9 @@ async function submitBooking(
 
 function setupEvents() {
 
-    /*
-       ======================================================
+    /* ======================================================
        FORM BOOKING
-       ======================================================
-    */
+       ====================================================== */
 
     const form =
         getElement('bookingForm');
@@ -1550,11 +1522,9 @@ function setupEvents() {
     }
 
 
-    /*
-       ======================================================
+    /* ======================================================
        DROPDOWN KENDARAAN
-       ======================================================
-    */
+       ====================================================== */
 
     const vehicle =
         getElement('vehicle');
@@ -1575,11 +1545,9 @@ function setupEvents() {
     }
 
 
-    /*
-       ======================================================
+    /* ======================================================
        TANGGAL
-       ======================================================
-    */
+       ====================================================== */
 
     const start =
         getElement('start');
