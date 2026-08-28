@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="id">
+
 <head>
+
     <meta charset="utf-8">
 
     <meta
@@ -10,62 +12,106 @@
 
     <meta
         name="description"
-        content="Transmind Nusantara Rental Mobil Jabodetabek. Booking online, lepas kunci, dengan driver, corporate, wedding dan pariwisata."
+        content="Transmind Nusantara Rental Mobil Jabodetabek. Rental mobil profesional, lepas kunci, dengan driver, corporate, wedding dan pariwisata."
+    >
+
+    <meta
+        name="theme-color"
+        content="#050505"
     >
 
     <title>
         Transmind Nusantara Rental Mobil | Jabodetabek
     </title>
 
+
+    <!-- FAVICON -->
+
     <link
         rel="icon"
         href="assets/images/logo/transmind.png"
     >
 
+
+    <!-- CSS -->
+
     <link
         rel="stylesheet"
         href="assets/css/style.css"
     >
+
 </head>
 
+
 <body>
+
 
 <!-- =========================================================
      HEADER
      ========================================================= -->
 
 <header>
+
     <div class="wrap nav">
+
 
         <a
             class="brand"
             href="#home"
         >
+
             <img
                 src="assets/images/logo/transmind.png"
                 alt="Transmind Nusantara"
             >
 
             <span>
-                <b>TRANSMIND</b>
-                <small>NUSANTARA RENTAL MOBIL</small>
+
+                <b>
+                    TRANSMIND
+                </b>
+
+                <small>
+                    NUSANTARA RENTAL MOBIL
+                </small>
+
             </span>
+
         </a>
 
+
         <nav>
-            <a href="#home">Home</a>
-            <a href="#armada">Armada</a>
-            <a href="#booking">Booking</a>
-            <a href="#layanan">Layanan</a>
-            <a href="#kontak">Kontak</a>
+
+            <a href="#home">
+                Home
+            </a>
+
+            <a href="#armada">
+                Armada
+            </a>
+
+            <a href="#booking">
+                Booking
+            </a>
+
+            <a href="#layanan">
+                Layanan
+            </a>
+
+            <a href="#kontak">
+                Kontak
+            </a>
+
         </nav>
 
     </div>
+
 </header>
 
 
+
 <!-- =========================================================
-     HOME
+     HERO
      ========================================================= -->
 
 <section
@@ -73,26 +119,67 @@
     class="hero"
 >
 
+
+    <!-- VIDEO HERO -->
+
+    <video
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+    >
+
+        <source
+            src="assets/video/hero.mp4"
+            type="video/mp4"
+        >
+
+        Browser Anda tidak mendukung video.
+
+    </video>
+
+
+    <!-- DARK OVERLAY -->
+
+    <div class="hero-overlay"></div>
+
+
     <div class="wrap hero-in">
 
-        <div>
+
+        <div class="hero-content">
+
 
             <label>
                 RENTAL MOBIL PROFESIONAL • JABODETABEK
             </label>
 
+
             <h1>
+
                 Perjalanan Anda,
+
                 <br>
-                <em>kami siapkan.</em>
+
+                <em>
+                    kami siapkan.
+                </em>
+
             </h1>
 
+
             <p>
+
                 Pilih kendaraan, tentukan tanggal dan layanan,
                 lalu kirim permintaan booking secara online.
+
             </p>
 
+
             <div class="actions">
+
 
                 <a
                     class="btn gold"
@@ -101,6 +188,7 @@
                     BOOKING SEKARANG
                 </a>
 
+
                 <a
                     class="btn outline"
                     href="#armada"
@@ -108,9 +196,11 @@
                     LIHAT ARMADA
                 </a>
 
+
             </div>
 
         </div>
+
 
         <img
             class="hero-logo"
@@ -123,24 +213,31 @@
 </section>
 
 
+
 <!-- =========================================================
      BOOKING
      ========================================================= -->
 
 <section
     id="booking"
-    class="section"
+    class="section booking-section"
 >
+
 
     <div class="wrap">
 
+
         <div class="head">
 
-            <label>BOOKING ONLINE</label>
+            <label>
+                BOOKING ONLINE
+            </label>
+
 
             <h2>
                 Pesan kendaraan Anda.
             </h2>
+
 
             <p>
                 Isi data di bawah untuk mengirim
@@ -150,14 +247,17 @@
         </div>
 
 
+
         <form
             id="bookingForm"
             class="booking"
         >
 
+
             <!-- NAMA -->
 
             <div>
+
                 <label for="name">
                     Nama
                 </label>
@@ -167,14 +267,18 @@
                     name="name"
                     type="text"
                     autocomplete="name"
+                    placeholder="Nama lengkap"
                     required
                 >
+
             </div>
+
 
 
             <!-- WHATSAPP -->
 
             <div>
+
                 <label for="phone">
                     WhatsApp
                 </label>
@@ -185,9 +289,12 @@
                     type="tel"
                     inputmode="tel"
                     autocomplete="tel"
+                    placeholder="08xxxxxxxxxx"
                     required
                 >
+
             </div>
+
 
 
             <!-- KENDARAAN -->
@@ -197,6 +304,7 @@
                 <label for="vehicle">
                     Kendaraan
                 </label>
+
 
                 <select
                     id="vehicle"
@@ -210,18 +318,19 @@
 
                 </select>
 
+
                 <div
                     id="vehiclePrice"
-                    style="
-                        margin-top:8px;
-                        font-weight:600;
-                    "
+                    class="vehicle-info"
                 >
+
                     Pilih kendaraan untuk melihat
-                    informasi rental.
+                    informasi kendaraan.
+
                 </div>
 
             </div>
+
 
 
             <!-- LAYANAN -->
@@ -231,6 +340,7 @@
                 <label for="service">
                     Layanan
                 </label>
+
 
                 <select
                     id="service"
@@ -262,6 +372,7 @@
             </div>
 
 
+
             <!-- TANGGAL MULAI -->
 
             <div>
@@ -269,6 +380,7 @@
                 <label for="start">
                     Tanggal Mulai
                 </label>
+
 
                 <input
                     id="start"
@@ -280,6 +392,7 @@
             </div>
 
 
+
             <!-- TANGGAL SELESAI -->
 
             <div>
@@ -287,6 +400,7 @@
                 <label for="end">
                     Tanggal Selesai
                 </label>
+
 
                 <input
                     id="end"
@@ -298,6 +412,7 @@
             </div>
 
 
+
             <!-- AREA -->
 
             <div>
@@ -305,6 +420,7 @@
                 <label for="area">
                     Area
                 </label>
+
 
                 <select
                     id="area"
@@ -336,6 +452,7 @@
             </div>
 
 
+
             <!-- CATATAN -->
 
             <div>
@@ -343,6 +460,7 @@
                 <label for="notes">
                     Catatan
                 </label>
+
 
                 <input
                     id="notes"
@@ -354,14 +472,18 @@
             </div>
 
 
+
             <!-- SUBMIT -->
 
             <button
                 class="btn gold full"
                 type="submit"
             >
+
                 KIRIM BOOKING
+
             </button>
+
 
 
             <!-- HASIL -->
@@ -372,11 +494,13 @@
                 aria-live="polite"
             ></p>
 
+
         </form>
 
     </div>
 
 </section>
+
 
 
 <!-- =========================================================
@@ -385,50 +509,87 @@
 
 <section
     id="armada"
-    class="section pale"
+    class="section fleet-section"
 >
+
 
     <div class="wrap">
 
+
         <div class="head">
 
-            <label>ARMADA</label>
+            <label>
+                ARMADA
+            </label>
+
 
             <h2>
                 Armada Transmind Nusantara.
             </h2>
 
+
             <p>
-                Daftar kendaraan diambil langsung
-                dari database.
+                Pilihan kendaraan untuk berbagai kebutuhan
+                perjalanan pribadi maupun bisnis.
             </p>
 
         </div>
 
 
-        <!-- STATUS ARMADA -->
 
-        <div
-            id="fleetStatus"
-            style="
-                margin-bottom:20px;
-                font-weight:600;
-            "
-        >
-            Memuat armada...
+        <!-- =================================================
+             VIDEO ARMADA
+             ================================================= -->
+
+        <div class="section-video">
+
+            <video
+                autoplay
+                muted
+                loop
+                playsinline
+                controls
+                preload="metadata"
+            >
+
+                <source
+                    src="assets/video/armada.mp4"
+                    type="video/mp4"
+                >
+
+                Browser Anda tidak mendukung video.
+
+            </video>
+
         </div>
 
 
-        <!-- HASIL ARMADA -->
+
+        <!-- STATUS -->
+
+        <div
+            id="fleetStatus"
+            class="fleet-status"
+        >
+
+            Memuat armada...
+
+        </div>
+
+
+
+        <!-- ARMADA -->
 
         <div
             id="cars"
             class="grid"
         ></div>
 
+
     </div>
 
 </section>
+
 
 
 <!-- =========================================================
@@ -437,80 +598,146 @@
 
 <section
     id="layanan"
-    class="section dark"
+    class="section services-section"
 >
+
 
     <div class="wrap">
 
-        <label>LAYANAN</label>
+
+        <label>
+            LAYANAN
+        </label>
+
 
         <h2>
             Untuk perjalanan pribadi maupun bisnis.
         </h2>
 
 
+
+        <!-- =================================================
+             VIDEO LAYANAN
+             ================================================= -->
+
+        <div class="section-video">
+
+            <video
+                autoplay
+                muted
+                loop
+                playsinline
+                controls
+                preload="metadata"
+            >
+
+                <source
+                    src="assets/video/layanan.mp4"
+                    type="video/mp4"
+                >
+
+                Browser Anda tidak mendukung video.
+
+            </video>
+
+        </div>
+
+
+
+        <!-- SERVICES -->
+
         <div class="services">
 
+
             <article>
-                <b>01</b>
+
+                <b>
+                    01
+                </b>
+
 
                 <h3>
                     Lepas Kunci
                 </h3>
 
+
                 <p>
                     Fleksibel untuk pelanggan
                     yang memenuhi persyaratan rental.
                 </p>
+
             </article>
 
 
+
             <article>
-                <b>02</b>
+
+                <b>
+                    02
+                </b>
+
 
                 <h3>
                     Dengan Driver
                 </h3>
 
+
                 <p>
                     Praktis untuk keluarga,
                     bisnis, event dan perjalanan khusus.
                 </p>
+
             </article>
 
 
+
             <article>
-                <b>03</b>
+
+                <b>
+                    03
+                </b>
+
 
                 <h3>
                     Corporate
                 </h3>
 
+
                 <p>
                     Solusi kendaraan untuk operasional
                     dan perjalanan dinas.
                 </p>
+
             </article>
 
 
+
             <article>
-                <b>04</b>
+
+                <b>
+                    04
+                </b>
+
 
                 <h3>
                     Wedding & Pariwisata
                 </h3>
 
+
                 <p>
                     Kendaraan untuk acara,
                     rombongan dan wisata.
                 </p>
+
             </article>
+
 
         </div>
 
     </div>
 
 </section>
+
 
 
 <!-- =========================================================
@@ -519,74 +746,114 @@
 
 <section
     id="kontak"
-    class="section"
+    class="section contact-section"
 >
+
 
     <div class="wrap contact">
 
+
         <div>
+
 
             <label>
                 AREA OPERASI
             </label>
 
+
             <h2>
                 Fokus Jabodetabek.
             </h2>
+
 
             <p>
                 Basis di Bekasi, melayani Jakarta,
                 Bogor, Depok, Tangerang dan Bekasi.
             </p>
 
+
             <p>
-                <b>WhatsApp:</b>
+
+                <b>
+                    WhatsApp:
+                </b>
+
                 0812-9267-7888
-                
+
             </p>
-            <p> 
-                <b>Pembayaran hanya melalui rekening dibawah ini:</b>
+
+
+            <div class="payment-box">
+
+                <b>
+                    PEMBAYARAN
+                </b>
+
+
+                <p>
+                    Pembayaran hanya melalui rekening resmi:
                 </p>
-              <p> 
-               <b> BCA </b>
-               </p>
-            <p> 
-             <b> PT TRANS MIND NUSANTARA </b>
-            </p>
-               <p>
-                  NO. REK. 2308666722
-            </p>
+
+
+                <strong>
+                    BCA
+                </strong>
+
+
+                <p>
+                    PT TRANS MIND NUSANTARA
+                </p>
+
+
+                <p>
+                    NO. REK. 2308666722
+                </p>
+
+            </div>
+
+
         </div>
 
 
+
         <div class="address">
+
 
             <b>
                 Alamat
             </b>
 
+
             <p>
+
                 Jl. Taman Tulip Raya No.18 Blk C2,
                 RT.003/RW.026, Pejuang,
                 Kecamatan Medan Satria,
                 Kota Bekasi,
                 Jawa Barat 17131
+
             </p>
+
 
             <a
                 class="btn gold"
                 href="https://wa.me/6281292677888"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
             >
+
                 CHAT WHATSAPP
+
             </a>
 
+
         </div>
+
 
     </div>
 
 </section>
+
 
 
 <!-- =========================================================
@@ -595,40 +862,50 @@
 
 <footer>
 
+
     <div class="wrap">
+
 
         <b>
             TRANSMIND NUSANTARA RENTAL MOBIL
         </b>
 
+
         <p>
             Rental mobil profesional Jabodetabek.
         </p>
 
+
         <small>
             © 2026 Transmind Nusantara Rental Mobil
         </small>
+
 
     </div>
 
 </footer>
 
 
+
 <!-- =========================================================
-     JAVASCRIPT
+     SUPABASE
      ========================================================= -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
 ></script>
 
+
 <script
     src="assets/js/config.js"
 ></script>
+
 
 <script
     src="assets/js/app.js"
 ></script>
 
+
 </body>
+
 </html>
