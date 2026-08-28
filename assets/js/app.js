@@ -1,6 +1,6 @@
 /* =========================================================
    TRANSMIND NUSANTARA
-   APP.JS — GO LIVE FINAL
+   APP.JS — GO LIVE FINAL ARMADA + BOOKING
    ========================================================= */
 
 'use strict';
@@ -81,24 +81,12 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
-}
 
-
-function rupiah(value) {
-
-    return new Intl.NumberFormat(
-        'id-ID',
-        {
-            style: 'currency',
-            currency: 'IDR',
-            maximumFractionDigits: 0
-        }
-    ).format(Number(value || 0));
 }
 
 
 /* =========================================================
-   NORMALISASI NAMA FILE
+   NORMALISASI
    ========================================================= */
 
 function normalizeImageKey(value) {
@@ -109,98 +97,347 @@ function normalizeImageKey(value) {
         .replace(/&/g, 'and')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
+
 }
 
 
 /* =========================================================
-   DAFTAR KANDIDAT GAMBAR
+   PEMETAAN FILE STORAGE
+   =========================================================
+   
+   INI BAGIAN PENTING.
+   
+   Nama file dibuat mengikuti file yang benar-benar
+   ada di bucket vehicle-images.
+   ========================================================= */
+
+const VEHICLE_IMAGE_MAP = {
+
+    'toyota-rocky':
+        [
+            'toyota-rocky.jpg',
+            'toyota-rocky.jpeg',
+            'toyota-rocky.webp',
+            'toyota-rocky.png',
+            'toyota-rocky..jpg'
+        ],
+
+    'toyota-avanza':
+        [
+            'toyota-avanza.jpeg',
+            'toyota-avanza.jpg',
+            'toyota-avanza.webp'
+        ],
+
+    'honda-brio':
+        [
+            'honda-brio.jpeg',
+            'honda-brio.jpg',
+            'honda-brio.webp'
+        ],
+
+    'toyota-avanza-2022':
+        [
+            'toyota-avanza-2022.jpeg',
+            'toyota-avanza-2022.jpg',
+            'toyota-avanza-2022.webp'
+        ],
+
+    'toyota-veloz-2022':
+        [
+            'toyota-veloz-2022.jpeg',
+            'toyota-veloz-2022.jpg',
+            'toyota-veloz-2022.webp'
+        ],
+
+    'honda-jazz':
+        [
+            'honda-jazz.jpeg',
+            'honda-jazz.jpg',
+            'honda-jazz.webp'
+        ],
+
+    'toyota-rush':
+        [
+            'toyota-rush.jpeg',
+            'toyota-rush.jpg',
+            'toyota-rush.webp'
+        ],
+
+    'mitsubishi-xpander-ultimate-2023':
+        [
+            'Mitsubishi-Xpander-2025.jpeg',
+            'mitsubishi-xpander-ultimate-2023.jpeg',
+            'mitsubishi-xpander-ultimate-2023.jpg',
+            'mitsubishi-xpander-ultimate-2023.webp'
+        ],
+
+    'honda-city-rs':
+        [
+            'honda-city-rs.jpeg',
+            'honda-city-rs.jpg',
+            'honda-city-rs.webp'
+        ],
+
+    'toyota-innova-reborn-bensin':
+        [
+            'toyota-innova-reborn-bensin.jpeg',
+            'toyota-innova-reborn-bensin.jpg',
+            'toyota-innova-reborn-bensin.webp'
+        ],
+
+    'toyota-innova-reborn-diesel':
+        [
+            'toyota-innova-reborn-diesel.jpeg',
+            'toyota-innova-reborn-diesel.jpg',
+            'toyota-innova-reborn-diesel.webp'
+        ],
+
+    'toyota-innova-zenix-g-bensin':
+        [
+            'toyota-innova-zenix-g-bensin.jpeg',
+            'toyota-innova-zenix-g-bensin.jpg',
+            'toyota-innova-zenix-g-bensin.webp'
+        ],
+
+    'toyota-innova-zenix-hybrid-g':
+        [
+            'innova-zenix-hybrid-g.jpeg',
+            'toyota-innova-zenix-hybrid-g.jpeg',
+            'toyota-innova-zenix-hybrid-g.jpg',
+            'toyota-innova-zenix-hybrid-g.webp'
+        ],
+
+    'honda-hr-v':
+        [
+            'honda-hr-v.jpeg',
+            'honda-hr-v.jpg',
+            'honda-hr-v.webp'
+        ],
+
+    'toyota-innova-venturer':
+        [
+            'toyota-innova-venturer.jpeg',
+            'toyota-innova-venturer.jpg',
+            'toyota-innova-venturer.webp'
+        ],
+
+    'honda-cr-v':
+        [
+            'honda-cr-v.jpeg',
+            'honda-cr-v.jpg',
+            'honda-cr-v.webp'
+        ],
+
+    'toyota-fortuner':
+        [
+            'toyota-fortuner.jpeg',
+            'toyota-fortuner.jpg',
+            'toyota-fortuner.webp'
+        ],
+
+    'mitsubishi-pajero':
+        [
+            'mitsubishi-pajero.jpeg',
+            'mitsubishi-pajero.jpg',
+            'mitsubishi-pajero.webp',
+            'mitsubishi-pajero..webp'
+        ],
+
+    'toyota-innova-zenix-hybrid-q':
+        [
+            'Toyota-Innova-Zenix-2024-2025.jpeg',
+            'toyota-innova-zenix-hybrid-q.jpeg',
+            'toyota-innova-zenix-hybrid-q.jpg',
+            'toyota-innova-zenix-hybrid-q.webp'
+        ],
+
+    'mitsubishi-pajero-4x4':
+        [
+            'mitsubishi-pajero.jpeg',
+            'mitsubishi-pajero.jpg',
+            'mitsubishi-pajero.webp'
+        ],
+
+    'honda-accord':
+        [
+            'honda-accord.jpeg',
+            'honda-accord.jpg',
+            'honda-accord.webp'
+        ],
+
+    'hyundai-palisade':
+        [
+            'hyundai-palisade.jpeg',
+            'hyundai-palisade.jpg',
+            'hyundai-palisade.webp'
+        ],
+
+    'hyundai-ioniq':
+        [
+            'hyundai-ioniq.jpeg',
+            'hyundai-ioniq.jpg',
+            'hyundai-ioniq.webp'
+        ],
+
+    'bmw':
+        [
+            'bmw.jpeg',
+            'bmw.jpg',
+            'bmw.webp'
+        ],
+
+    'honda-civic-rs':
+        [
+            'honda-civic-rs.jpeg',
+            'honda-civic-rs.jpg',
+            'honda-civic-rs.webp'
+        ],
+
+    'toyota-alphard-2022':
+        [
+            'toyota-alphard-2024.jpeg',
+            'toyota-alphard-2022.jpeg',
+            'toyota-alphard-2022.jpg',
+            'toyota-alphard-2022.webp'
+        ],
+
+    'toyota-alphard-2024':
+        [
+            'toyota-alphard-2024.jpeg',
+            'toyota-alphard-2024.jpg',
+            'toyota-alphard-2024.webp'
+        ],
+
+    'toyota-vellfire':
+        [
+            'toyota-vellfire.jpeg',
+            'toyota-vellfire (2).jpeg',
+            'toyota-vellfire.jpg',
+            'toyota-vellfire.webp'
+        ],
+
+    'mercedes-benz-e-300-amg':
+        [
+            'mercedes-benz-e-300-amg.jpeg',
+            'mercedes-benz-e-300-amg.jpg',
+            'mercedes-benz-e-300-amg.webp'
+        ],
+
+    'mercedes-benz-s-450-l':
+        [
+            'mercedes-benz-s-450-l.jpeg',
+            'mercedes-benz-s-450-l.jpg',
+            'mercedes-benz-s-450-l.webp'
+        ],
+
+    'toyota-land-cruiser-vxr-2023':
+        [
+            'toyota-land-cruiser-vxr-2023.jpeg',
+            'toyota-land-cruiser-vxr-2023.jpg',
+            'toyota-land-cruiser-vxr-2023.webp'
+        ],
+
+    'toyota-hiace-premio-luxury':
+        [
+            'toyota-hiace-premio-luxury.jpeg',
+            'toyota-hiace-premio-luxury.jpg',
+            'toyota-hiace-premio-luxury.webp'
+        ],
+
+    'toyota-hiace-premio':
+        [
+            'toyota-hiace-premio-luxury.jpeg',
+            'toyota-hiace-premio.jpeg',
+            'toyota-hiace-premio.jpg',
+            'toyota-hiace-premio.webp'
+        ],
+
+    'toyota-hiace-commuter':
+        [
+            'toyota-hiace-commuter.jpeg',
+            'toyota-hiace-commuter.jpg',
+            'toyota-hiace-commuter.webp'
+        ],
+
+    'isuzu-elf':
+        [
+            'isuzu-elf.jpeg',
+            'isuzu-elf.jpg',
+            'isuzu-elf.webp'
+        ],
+
+    'bus-medium':
+        [
+            'bus-medium.jpeg',
+            'bus-medium.jpg',
+            'bus-medium.webp',
+            'bus-medium.png'
+        ],
+
+    'big-bus':
+        [
+            'big-bus.jpeg',
+            'big-bus.jpg',
+            'big-bus.webp',
+            'big-bus.png'
+        ],
+
+    'suzuki-ertiga-hybrid-2025':
+        [
+            'Suzuki-Ertiga-Hybrid-2025.webp',
+            'suzuki-ertiga-hybrid-2025.webp',
+            'Suzuki-Ertiga-Hybrid-2025.jpeg',
+            'suzuki-ertiga-hybrid-2025.jpeg'
+        ]
+
+};
+
+
+/* =========================================================
+   BUAT KANDIDAT GAMBAR
    ========================================================= */
 
 function getVehicleImageCandidates(vehicle) {
 
-    const name = String(
-        vehicle?.name || ''
-    ).trim();
+    const name =
+        String(vehicle?.name || '').trim();
 
-    const slug = String(
-        vehicle?.slug || ''
-    ).trim();
+    const slug =
+        String(vehicle?.slug || '').trim();
 
-    const key = normalizeImageKey(
-        slug || name
-    );
+    const key =
+        normalizeImageKey(slug || name);
 
-    const candidates = [];
+    let candidates = [];
 
+    /*
+       Prioritas:
+       1. mapping khusus
+       2. slug
+       3. nama
+    */
 
-    /* ======================================================
-       NAMA KHUSUS STORAGE
-       ====================================================== */
-
-    const specialMap = {
-
-        'toyota-rocky': [
-            'toyota-rocky..jpg',
-            'toyota-rocky.jpg',
-            'toyota-rocky.jpeg',
-            'toyota-rocky.webp',
-            'toyota-rocky.png'
-        ],
-
-        'toyota-innova-zenix-hybrid-g': [
-            'toyota-innova-zenix-hybrid-g.jpg',
-            'toyota-innova-zenix-hybrid-g.jpeg',
-            'toyota-innova-zenix-hybrid-g.webp',
-            'toyota-innova-zenix-hybrid-g.png'
-        ],
-
-        'mitsubishi-pajero': [
-            'mitsubishi-pajero..webp',
-            'mitsubishi-pajero.webp',
-            'mitsubishi-pajero.jpg',
-            'mitsubishi-pajero.jpeg',
-            'mitsubishi-pajero.png'
-        ],
-
-        'bus-medium': [
-            'bus-medium.jpg',
-            'bus-medium.jpeg',
-            'bus-medium.webp',
-            'bus-medium.png',
-            'bus-medium..jpg',
-            'bus-medium..jpeg',
-            'bus-medium..webp'
-        ]
-
-    };
-
-
-    if (specialMap[key]) {
+    if (VEHICLE_IMAGE_MAP[key]) {
 
         candidates.push(
-            ...specialMap[key]
+            ...VEHICLE_IMAGE_MAP[key]
         );
+
     }
 
-
-    /* ======================================================
-       FALLBACK SLUG
-       ====================================================== */
 
     if (slug) {
 
         candidates.push(
-            `${slug}.jpg`,
             `${slug}.jpeg`,
+            `${slug}.jpg`,
             `${slug}.webp`,
             `${slug}.png`
         );
+
     }
 
-
-    /* ======================================================
-       FALLBACK NAMA
-       ====================================================== */
 
     if (name) {
 
@@ -208,22 +445,24 @@ function getVehicleImageCandidates(vehicle) {
             normalizeImageKey(name);
 
         candidates.push(
-            `${nameKey}.jpg`,
             `${nameKey}.jpeg`,
+            `${nameKey}.jpg`,
             `${nameKey}.webp`,
             `${nameKey}.png`
         );
+
     }
 
 
     return [
         ...new Set(candidates)
     ];
+
 }
 
 
 /* =========================================================
-   URL PUBLIC STORAGE
+   STORAGE PUBLIC URL
    ========================================================= */
 
 function getStoragePublicUrl(fileName) {
@@ -244,36 +483,19 @@ function getStoragePublicUrl(fileName) {
     } catch (error) {
 
         console.error(
-            'Gagal membuat Storage URL:',
+            'Gagal membuat URL Storage:',
             error
         );
 
         return '';
+
     }
+
 }
 
 
 /* =========================================================
-   AMBIL URL GAMBAR
-   ========================================================= */
-
-function getVehicleImageUrl(vehicle) {
-
-    const candidates =
-        getVehicleImageCandidates(vehicle);
-
-    if (!candidates.length) {
-        return '';
-    }
-
-    return getStoragePublicUrl(
-        candidates[0]
-    );
-}
-
-
-/* =========================================================
-   COBA GAMBAR BERIKUTNYA
+   TEST GAMBAR SATU PER SATU
    ========================================================= */
 
 function tryNextVehicleImage(img) {
@@ -291,14 +513,10 @@ function tryNextVehicleImage(img) {
                 img.dataset.imageCandidates || '[]'
             );
 
-    } catch (error) {
-
-        console.warn(
-            'Image candidates tidak valid:',
-            error
-        );
+    } catch {
 
         candidates = [];
+
     }
 
 
@@ -316,30 +534,31 @@ function tryNextVehicleImage(img) {
         candidates.length
     ) {
 
-        img.style.display =
-            'none';
+        img.style.display = 'none';
 
 
         const placeholder =
-            img.parentElement
-                ?.querySelector(
-                    '.vehicle-placeholder'
-                );
+            img.parentElement?.querySelector(
+                '.vehicle-placeholder'
+            );
 
 
         if (placeholder) {
 
             placeholder.style.display =
                 'flex';
+
         }
 
 
         console.warn(
-            'Semua kandidat gambar gagal:',
+            'Gambar tidak ditemukan untuk kendaraan:',
+            img.alt,
             candidates
         );
 
         return;
+
     }
 
 
@@ -347,35 +566,30 @@ function tryNextVehicleImage(img) {
         String(index);
 
 
+    const nextFile =
+        candidates[index];
+
+
     const nextUrl =
         getStoragePublicUrl(
-            candidates[index]
+            nextFile
         );
-
-
-    if (!nextUrl) {
-
-        tryNextVehicleImage(
-            img
-        );
-
-        return;
-    }
 
 
     console.log(
         'Mencoba gambar:',
-        candidates[index]
+        nextFile
     );
 
 
     img.src =
         nextUrl;
+
 }
 
 
 /* =========================================================
-   KONFIGURASI SUPABASE
+   SUPABASE CONFIG
    ========================================================= */
 
 function configured() {
@@ -389,10 +603,10 @@ function configured() {
 
         window.TRANSMIND_SUPABASE_ANON_KEY &&
 
-        window.TRANSMIND_SUPABASE_ANON_KEY
-            .length > 20
+        window.TRANSMIND_SUPABASE_ANON_KEY.length > 20
 
     );
+
 }
 
 
@@ -417,6 +631,7 @@ function setFleetStatus(
 
     status.dataset.status =
         type;
+
 }
 
 
@@ -441,7 +656,7 @@ function showCars(list) {
 
 
     /* ======================================================
-       DROPDOWN BOOKING
+       DROPDOWN
        ====================================================== */
 
     if (vehicleSelect) {
@@ -454,9 +669,7 @@ function showCars(list) {
             vehicle => {
 
                 const option =
-                    document.createElement(
-                        'option'
-                    );
+                    document.createElement('option');
 
 
                 option.value =
@@ -471,14 +684,12 @@ function showCars(list) {
                 vehicleSelect.appendChild(
                     option
                 );
+
             }
         );
+
     }
 
-
-    /* ======================================================
-       KARTU ARMADA
-       ====================================================== */
 
     if (!cars) {
         return;
@@ -494,6 +705,7 @@ function showCars(list) {
         `;
 
         return;
+
     }
 
 
@@ -513,7 +725,7 @@ function showCars(list) {
 
                 const capacity =
                     vehicle.capacity ||
-                    'Sesuai tipe kendaraan';
+                    'Kapasitas sesuai tipe kendaraan';
 
 
                 const id =
@@ -527,13 +739,18 @@ function showCars(list) {
                     );
 
 
+                const firstFile =
+                    candidates[0] || '';
+
+
                 const firstUrl =
-                    getVehicleImageUrl(
-                        vehicle
+                    getStoragePublicUrl(
+                        firstFile
                     );
 
 
                 return `
+
                     <article
                         class="car"
                         data-vehicle-id="${escapeHtml(id)}"
@@ -544,28 +761,23 @@ function showCars(list) {
                             ${
                                 firstUrl
                                     ? `
-                                    <img
-                                        src="${escapeHtml(firstUrl)}"
-                                        alt="${escapeHtml(name)}"
-                                        loading="lazy"
+                                        <img
+                                            src="${escapeHtml(firstUrl)}"
 
-                                        data-image-index="0"
+                                            alt="${escapeHtml(name)}"
 
-                                        data-image-candidates="${escapeHtml(
-                                            JSON.stringify(candidates)
-                                        )}"
+                                            loading="lazy"
 
-                                        style="
-                                            width:100%;
-                                            height:220px;
-                                            object-fit:cover;
-                                            display:block;
-                                        "
+                                            data-image-index="0"
 
-                                        onerror="
-                                            tryNextVehicleImage(this);
-                                        "
-                                    >
+                                            data-image-candidates="${escapeHtml(
+                                                JSON.stringify(candidates)
+                                            )}"
+
+                                            onerror="
+                                                tryNextVehicleImage(this);
+                                            "
+                                        >
                                     `
                                     : ''
                             }
@@ -576,12 +788,6 @@ function showCars(list) {
 
                                 style="
                                     display:${firstUrl ? 'none' : 'flex'};
-                                    width:100%;
-                                    height:220px;
-                                    align-items:center;
-                                    justify-content:center;
-                                    text-align:center;
-                                    padding:20px;
                                 "
                             >
 
@@ -596,10 +802,27 @@ function showCars(list) {
 
                         <div class="ci">
 
+                            <!-- NAMA KENDARAAN -->
+
+                            <h3
+                                style="
+                                    margin:0 0 7px;
+                                    font-size:18px;
+                                    color:#111923;
+                                "
+                            >
+                                ${escapeHtml(name)}
+                            </h3>
+
+
+                            <!-- JENIS / KATEGORI -->
+
                             <b>
                                 ${escapeHtml(category)}
                             </b>
 
+
+                            <!-- KAPASITAS -->
 
                             <p>
                                 ${escapeHtml(capacity)}
@@ -609,6 +832,7 @@ function showCars(list) {
 
                             <button
                                 type="button"
+
                                 class="btn gold"
 
                                 data-select-vehicle="${escapeHtml(id)}"
@@ -619,6 +843,7 @@ function showCars(list) {
                         </div>
 
                     </article>
+
                 `;
 
             }
@@ -626,7 +851,7 @@ function showCars(list) {
 
 
     /* ======================================================
-       EVENT TOMBOL PILIH
+       BUTTON PILIH
        ====================================================== */
 
     cars
@@ -650,6 +875,7 @@ function showCars(list) {
 
             }
         );
+
 }
 
 
@@ -683,6 +909,7 @@ function selectVehicle(vehicleId) {
         );
 
         return;
+
     }
 
 
@@ -696,6 +923,7 @@ function selectVehicle(vehicleId) {
 
 
     select.focus();
+
 }
 
 
@@ -703,9 +931,7 @@ function selectVehicle(vehicleId) {
    INFORMASI KENDARAAN
    ========================================================= */
 
-function updateVehicleInfo(
-    vehicleId
-) {
+function updateVehicleInfo(vehicleId) {
 
     const priceBox =
         getElement('vehiclePrice');
@@ -729,6 +955,7 @@ function updateVehicleInfo(
             'Pilih kendaraan untuk melihat informasi rental.';
 
         return;
+
     }
 
 
@@ -740,11 +967,12 @@ function updateVehicleInfo(
             vehicle.capacity ||
             'Kapasitas sesuai tipe kendaraan'
         }`;
+
 }
 
 
 /* =========================================================
-   LOAD ARMADA DARI SUPABASE
+   LOAD ARMADA
    ========================================================= */
 
 async function loadVehicles() {
@@ -772,9 +1000,7 @@ async function loadVehicles() {
                     name,
 
                     slug:
-                        normalizeImageKey(
-                            name
-                        ),
+                        normalizeImageKey(name),
 
                     category:
                         'Armada',
@@ -798,6 +1024,7 @@ async function loadVehicles() {
 
 
         return;
+
     }
 
 
@@ -819,18 +1046,19 @@ async function loadVehicles() {
         const {
             data,
             error
-        } = await sb
-            .from('vehicles')
-            .select(
-                'id,name,slug,category,capacity'
-            )
-            .eq(
-                'active',
-                true
-            )
-            .order(
-                'name'
-            );
+        } =
+            await sb
+                .from('vehicles')
+                .select(
+                    'id,name,slug,category,capacity'
+                )
+                .eq(
+                    'active',
+                    true
+                )
+                .order(
+                    'name'
+                );
 
 
         if (error) {
@@ -841,6 +1069,7 @@ async function loadVehicles() {
             );
 
             throw error;
+
         }
 
 
@@ -848,11 +1077,6 @@ async function loadVehicles() {
             !Array.isArray(data) ||
             data.length === 0
         ) {
-
-            console.warn(
-                'Tidak ada kendaraan aktif.'
-            );
-
 
             showCars([]);
 
@@ -864,6 +1088,7 @@ async function loadVehicles() {
 
 
             return;
+
         }
 
 
@@ -902,9 +1127,7 @@ async function loadVehicles() {
                     name,
 
                     slug:
-                        normalizeImageKey(
-                            name
-                        ),
+                        normalizeImageKey(name),
 
                     category:
                         'Armada',
@@ -925,12 +1148,14 @@ async function loadVehicles() {
             'Database tidak dapat diakses. Mode cadangan aktif.',
             'warning'
         );
+
     }
+
 }
 
 
 /* =========================================================
-   DATA FORM
+   FORM DATA
    ========================================================= */
 
 function getFormData() {
@@ -1000,6 +1225,7 @@ function getFormData() {
                 .trim() || ''
 
     };
+
 }
 
 
@@ -1018,6 +1244,7 @@ function validateBooking(
             'Silakan pilih kendaraan terlebih dahulu.';
 
         return false;
+
     }
 
 
@@ -1030,6 +1257,7 @@ function validateBooking(
             'Database armada belum terhubung. Silakan refresh halaman.';
 
         return false;
+
     }
 
 
@@ -1039,6 +1267,7 @@ function validateBooking(
             'Nama wajib diisi.';
 
         return false;
+
     }
 
 
@@ -1048,6 +1277,7 @@ function validateBooking(
             'Nomor WhatsApp wajib diisi.';
 
         return false;
+
     }
 
 
@@ -1060,6 +1290,7 @@ function validateBooking(
             'Tanggal booking wajib diisi.';
 
         return false;
+
     }
 
 
@@ -1072,20 +1303,17 @@ function validateBooking(
             'Tanggal selesai tidak boleh sebelum tanggal mulai.';
 
         return false;
+
     }
 
 
     return true;
+
 }
 
 
 /* =========================================================
-   WHATSAPP BOOKING BERHASIL
-   =========================================================
-   
-   PENTING:
-   Harga dan lama sewa SENGAJA tidak dimasukkan
-   ke dalam pesan WhatsApp.
+   WHATSAPP BERHASIL
    ========================================================= */
 
 function openSuccessWhatsApp(
@@ -1109,7 +1337,8 @@ function openSuccessWhatsApp(
         '-';
 
 
-    const message = `Halo Transmind Nusantara,
+    const message =
+`Halo Transmind Nusantara,
 
 Booking saya sudah dibuat.
 
@@ -1136,39 +1365,17 @@ Terima kasih.`;
         'https://wa.me/' +
         WA_NUMBER +
         '?text=' +
-        encodeURIComponent(
-            message
-        );
+        encodeURIComponent(message);
 
-
-    console.log(
-        '=== WHATSAPP FINAL ==='
-    );
-
-    console.log(
-        message
-    );
-
-
-    console.log(
-        'Membuka WhatsApp:',
-        url
-    );
-
-
-    /*
-       ======================================================
-       BUKA WHATSAPP
-       ======================================================
-    */
 
     window.location.href =
         url;
+
 }
 
 
 /* =========================================================
-   WHATSAPP JIKA KENDARAAN TIDAK TERSEDIA
+   WHATSAPP ALTERNATIF
    ========================================================= */
 
 function openUnavailableWhatsApp(
@@ -1176,7 +1383,8 @@ function openUnavailableWhatsApp(
     messageText
 ) {
 
-    const message = `Halo Transmind Nusantara.
+    const message =
+`Halo Transmind Nusantara.
 
 Saya ingin menyewa kendaraan, tetapi kendaraan yang saya pilih sedang tidak tersedia.
 
@@ -1200,19 +1408,12 @@ Terima kasih.`;
         'https://wa.me/' +
         WA_NUMBER +
         '?text=' +
-        encodeURIComponent(
-            message
-        );
-
-
-    console.log(
-        'Membuka WhatsApp alternatif:',
-        url
-    );
+        encodeURIComponent(message);
 
 
     window.location.href =
         url;
+
 }
 
 
@@ -1220,9 +1421,7 @@ Terima kasih.`;
    SUBMIT BOOKING
    ========================================================= */
 
-async function submitBooking(
-    event
-) {
+async function submitBooking(event) {
 
     event.preventDefault();
 
@@ -1248,10 +1447,6 @@ async function submitBooking(
         getFormData();
 
 
-    /* ======================================================
-       VALIDASI
-       ====================================================== */
-
     if (
         !validateBooking(
             data,
@@ -1260,6 +1455,7 @@ async function submitBooking(
     ) {
 
         return;
+
     }
 
 
@@ -1269,65 +1465,47 @@ async function submitBooking(
             'Database belum terhubung. Silakan refresh halaman.';
 
         return;
+
     }
 
 
     try {
 
-        console.log(
-            'Mengirim booking:',
-            data
-        );
-
-
-        /* ==================================================
-           RPC CREATE BOOKING
-           ================================================== */
-
         const {
             data: rpcData,
             error
-        } = await sb.rpc(
-            'create_booking',
-            {
+        } =
+            await sb.rpc(
+                'create_booking',
+                {
 
-                p_name:
-                    data.name,
+                    p_name:
+                        data.name,
 
-                p_phone:
-                    data.phone,
+                    p_phone:
+                        data.phone,
 
-                p_vehicle_id:
-                    data.vehicleId,
+                    p_vehicle_id:
+                        data.vehicleId,
 
-                p_service:
-                    data.service,
+                    p_service:
+                        data.service,
 
-                p_start_date:
-                    data.start,
+                    p_start_date:
+                        data.start,
 
-                p_end_date:
-                    data.end,
+                    p_end_date:
+                        data.end,
 
-                p_area:
-                    data.area,
+                    p_area:
+                        data.area,
 
-                p_notes:
-                    data.notes
+                    p_notes:
+                        data.notes
 
-            }
-        );
+                }
+            );
 
-
-        console.log(
-            'CREATE BOOKING RESULT:',
-            rpcData
-        );
-
-
-        /* ==================================================
-           ERROR RPC
-           ================================================== */
 
         if (error) {
 
@@ -1343,17 +1521,12 @@ async function submitBooking(
 
 
             return;
+
         }
 
 
-        /* ==================================================
-           HASIL RPC
-           ================================================== */
-
         const result =
-            Array.isArray(
-                rpcData
-            )
+            Array.isArray(rpcData)
                 ? rpcData[0]
                 : rpcData;
 
@@ -1364,18 +1537,9 @@ async function submitBooking(
                 'Sistem tidak menerima hasil booking dari database.';
 
             return;
+
         }
 
-
-        console.log(
-            'HASIL BOOKING FINAL:',
-            result
-        );
-
-
-        /* ==================================================
-           BOOKING GAGAL
-           ================================================== */
 
         if (!result.success) {
 
@@ -1397,16 +1561,14 @@ async function submitBooking(
                     data,
                     message
                 );
+
             }
 
 
             return;
+
         }
 
-
-        /* ==================================================
-           BOOKING BERHASIL
-           ================================================== */
 
         resultBox.innerHTML = `
 
@@ -1416,8 +1578,7 @@ async function submitBooking(
             <b>
                 Kode:
                 ${escapeHtml(
-                    result.booking_code ||
-                    '-'
+                    result.booking_code || '-'
                 )}
             </b>
 
@@ -1429,26 +1590,14 @@ async function submitBooking(
                 data.vehicleName
             )}
 
-            
         `;
 
-
-        /* ==================================================
-           KIRIM KE WHATSAPP
-           
-           HARGA TIDAK DIKIRIM.
-           LAMA SEWA TIDAK DIKIRIM.
-           ================================================== */
 
         openSuccessWhatsApp(
             data,
             result
         );
 
-
-        /* ==================================================
-           RESET FORM
-           ================================================== */
 
         form.reset();
 
@@ -1461,13 +1610,11 @@ async function submitBooking(
 
             vehicleSelect.selectedIndex =
                 0;
+
         }
 
 
-        updateVehicleInfo(
-            ''
-        );
-
+        updateVehicleInfo('');
 
     } catch (error) {
 
@@ -1480,19 +1627,17 @@ async function submitBooking(
         resultBox.textContent =
             'Terjadi kesalahan: ' +
             error.message;
+
     }
+
 }
 
 
 /* =========================================================
-   EVENT LISTENER
+   EVENT
    ========================================================= */
 
 function setupEvents() {
-
-    /* ======================================================
-       FORM BOOKING
-       ====================================================== */
 
     const form =
         getElement('bookingForm');
@@ -1504,12 +1649,9 @@ function setupEvents() {
             'submit',
             submitBooking
         );
+
     }
 
-
-    /* ======================================================
-       DROPDOWN KENDARAAN
-       ====================================================== */
 
     const vehicle =
         getElement('vehicle');
@@ -1527,12 +1669,9 @@ function setupEvents() {
 
             }
         );
+
     }
 
-
-    /* ======================================================
-       TANGGAL
-       ====================================================== */
 
     const start =
         getElement('start');
@@ -1545,16 +1684,14 @@ function setupEvents() {
     const today =
         new Date()
             .toISOString()
-            .slice(
-                0,
-                10
-            );
+            .slice(0, 10);
 
 
     if (start) {
 
         start.min =
             today;
+
     }
 
 
@@ -1562,6 +1699,7 @@ function setupEvents() {
 
         end.min =
             today;
+
     }
 
 
@@ -1586,11 +1724,14 @@ function setupEvents() {
 
                     end.value =
                         start.value;
+
                 }
 
             }
         );
+
     }
+
 }
 
 
@@ -1614,6 +1755,7 @@ async function init() {
     console.log(
         'TRANSMIND: initialization selesai'
     );
+
 }
 
 
