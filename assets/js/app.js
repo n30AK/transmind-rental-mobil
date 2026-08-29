@@ -267,7 +267,10 @@ function filterValidVehicles(list) {
 
 function showCars(list) {
 
-    vehiclesCache = filterValidVehicles(list);
+
+    vehiclesCache =
+        filterValidVehicles(list);
+
 
     console.log(
         'ARMADA VALID UNTUK DITAMPILKAN:',
@@ -275,8 +278,14 @@ function showCars(list) {
         vehiclesCache
     );
 
-    const vehicleSelect = getElement('vehicle');
-    const cars = getElement('cars');
+
+    const vehicleSelect =
+        getElement('vehicle');
+
+
+    const cars =
+        getElement('cars');
+
 
     /* =====================================================
        DROPDOWN BOOKING
@@ -287,18 +296,27 @@ function showCars(list) {
         vehicleSelect.innerHTML =
             '<option value="">Pilih kendaraan</option>';
 
+
         vehiclesCache.forEach(vehicle => {
 
-            const option = document.createElement('option');
+            const option =
+                document.createElement('option');
 
-            option.value = vehicle.id || '';
+
+            option.value =
+                vehicle.id || '';
+
 
             option.textContent =
                 vehicle.name || 'Kendaraan';
 
+
             vehicleSelect.appendChild(option);
+
         });
+
     }
+
 
     /* =====================================================
        CONTAINER ARMADA
@@ -311,7 +329,9 @@ function showCars(list) {
         );
 
         return;
+
     }
+
 
     /* =====================================================
        TIDAK ADA ARMADA
@@ -320,175 +340,236 @@ function showCars(list) {
     if (!vehiclesCache.length) {
 
         cars.innerHTML = `
+
             <div class="fleet-empty">
+
                 <strong>
                     Armada belum tersedia.
                 </strong>
+
                 <br>
-                Silakan hubungi Transmind Nusantara.
+
+                Silakan hubungi
+                Transmind Nusantara.
+
             </div>
+
         `;
 
+
         return;
+
     }
 
+
     /* =====================================================
-       RENDER 26 ARMADA
+       BUAT KARTU ARMADA
        ===================================================== */
 
-    cars.innerHTML = vehiclesCache.map(vehicle => {
+    cars.innerHTML =
+        vehiclesCache.map(vehicle => {
 
-        const name =
-            vehicle.name ||
-            'Kendaraan';
 
-        const category =
-            vehicle.category ||
-            'Armada Transmind';
+            const name =
+                vehicle.name ||
+                'Kendaraan';
 
-        const capacity =
-            vehicle.capacity ||
-            'Kapasitas sesuai tipe kendaraan';
 
-        const id =
-            vehicle.id ||
-            '';
+            /*
+               JENIS KENDARAAN
+            */
 
-        const imageUrl =
-            getVehicleImageUrl(vehicle);
+            const category =
+                vehicle.category ||
+                'Armada Transmind';
 
-        console.log(
-            'RENDER ARMADA:',
-            name,
-            '| kategori:',
-            category,
-            '| image:',
-            imageUrl
-        );
 
-        return `
+            /*
+               KAPASITAS
+            */
 
-            <article
-                class="car"
-                data-vehicle-id="${escapeHtml(id)}"
-            >
+            const capacity =
+                vehicle.capacity ||
+                'Kapasitas sesuai tipe kendaraan';
 
-                <div class="photo">
 
-                    ${
-                        imageUrl
-                            ? `
+            const id =
+                vehicle.id ||
+                '';
+
+
+            const imageUrl =
+                getVehicleImageUrl(vehicle);
+
+
+            return `
+
+                <article
+                    class="car"
+                    data-vehicle-id="${escapeHtml(id)}"
+                >
+
+                    <!-- FOTO -->
+
+                    <div class="photo">
+
+
+                        ${
+
+                            imageUrl
+
+                                ?
+
+                                `
+
                                 <img
+
                                     src="${escapeHtml(imageUrl)}"
+
                                     alt="${escapeHtml(name)}"
-                                    loading="eager"
-                                    decoding="async"
-                                    width="1600"
-                                    height="1032"
-                                    style="
-                                        width:100%;
-                                        height:220px;
-                                        object-fit:cover;
-                                        display:block;
-                                    "
-                                    onload="
-                                        console.log(
-                                            'IMAGE LOADED:',
-                                            this.alt
-                                        );
-                                    "
+
+                                    loading="lazy"
+
                                     onerror="
                                         handleVehicleImageError(this);
                                     "
-                                >
-                            `
-                            : ''
-                    }
 
-                    <div
-                        class="vehicle-placeholder"
-                        style="
-                            display:${imageUrl ? 'none' : 'flex'};
-                            width:100%;
-                            height:220px;
-                            align-items:center;
-                            justify-content:center;
-                            text-align:center;
-                            padding:20px;
-                        "
-                    >
-                        <strong>
-                            ${escapeHtml(name)}
-                        </strong>
+                                >
+
+                                `
+
+                                :
+
+                                ''
+
+                        }
+
+
+                        <!-- PLACEHOLDER -->
+
+                        <div
+                            class="vehicle-placeholder"
+
+                            style="
+                                display:${imageUrl ? 'none' : 'flex'};
+                                width:100%;
+                                height:220px;
+                                align-items:center;
+                                justify-content:center;
+                                text-align:center;
+                                padding:20px;
+                            "
+                        >
+
+                            <strong>
+
+                                ${escapeHtml(name)}
+
+                            </strong>
+
+                        </div>
+
+
                     </div>
 
-                </div>
 
-                <div class="ci">
+                    <!-- INFORMASI ARMADA -->
 
-                    <b>
-                        ${escapeHtml(category)}
-                    </b>
+                    <div class="ci">
 
-                    <h3>
-                        ${escapeHtml(name)}
-                    </h3>
 
-                    <p>
-                        ${escapeHtml(capacity)}
-                        • Jabodetabek
-                    </p>
+                        <!-- NAMA KENDARAAN -->
 
-                    <button
-                        type="button"
-                        class="btn gold"
-                        data-select-vehicle="${escapeHtml(id)}"
-                    >
-                        PILIH
-                    </button>
+                        <h3
+                            style="
+                                margin:0 0 8px;
+                                color:#ffffff;
+                                font-size:17px;
+                                line-height:1.35;
+                            "
+                        >
 
-                </div>
+                            ${escapeHtml(name)}
 
-            </article>
+                        </h3>
 
-        `;
 
-    }).join('');
+                        <!-- JENIS KENDARAAN DI BAWAH GAMBAR -->
+
+                        <b>
+
+                            JENIS:
+                            ${escapeHtml(category)}
+
+                        </b>
+
+
+                        <!-- KAPASITAS -->
+
+                        <p>
+
+                            ${escapeHtml(capacity)}
+
+                            &nbsp;•&nbsp;
+
+                            Jabodetabek
+
+                        </p>
+
+
+                        <!-- TOMBOL PILIH -->
+
+                        <button
+                            type="button"
+
+                            class="btn gold"
+
+                            data-select-vehicle="${escapeHtml(id)}"
+                        >
+
+                            PILIH KENDARAAN
+
+                        </button>
+
+
+                    </div>
+
+
+                </article>
+
+            `;
+
+
+        }).join('');
+
 
     /* =====================================================
        EVENT TOMBOL PILIH
        ===================================================== */
 
     cars
-        .querySelectorAll('[data-select-vehicle]')
+        .querySelectorAll(
+            '[data-select-vehicle]'
+        )
         .forEach(button => {
+
 
             button.addEventListener(
                 'click',
                 () => {
 
+
                     selectVehicle(
                         button.dataset.selectVehicle
                     );
 
+
                 }
             );
 
+
         });
 
-    /* =====================================================
-       VERIFIKASI DOM
-       ===================================================== */
-
-    console.log(
-        'TOTAL KARTU ARMADA DI DOM:',
-        cars.querySelectorAll('.car').length
-    );
-
-    console.log(
-        'TOTAL GAMBAR ARMADA DI DOM:',
-        cars.querySelectorAll('img').length
-    );
 }
 
 /* =========================================================
