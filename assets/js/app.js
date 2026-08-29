@@ -1,6 +1,6 @@
 /* =========================================================
    TRANSMIND NUSANTARA RENTAL MOBIL
-   APP.JS — GO LIVE FINAL IMAGE_PATH
+   APP.JS — GO LIVE FLEET FIX
    ========================================================= */
 
 'use strict';
@@ -33,7 +33,6 @@ function getElement(id) {
 
 
 function escapeHtml(value) {
-
     return String(value ?? '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -44,7 +43,7 @@ function escapeHtml(value) {
 
 
 /* =========================================================
-   CEK KONFIGURASI SUPABASE
+   CEK KONFIGURASI
    ========================================================= */
 
 function configured() {
@@ -66,9 +65,7 @@ function setFleetStatus(message, type = 'normal') {
 
     const status = getElement('fleetStatus');
 
-    if (!status) {
-        return;
-    }
+    if (!status) return;
 
     status.textContent = message;
     status.dataset.status = type;
@@ -78,23 +75,18 @@ function setFleetStatus(message, type = 'normal') {
 
 
 /* =========================================================
-   URL GAMBAR DARI SUPABASE STORAGE
+   URL GAMBAR SUPABASE STORAGE
    ========================================================= */
 
 function getVehicleImageUrl(vehicle) {
 
-    if (!sb) {
-        return '';
-    }
-
+    if (!sb) return '';
 
     const imagePath = String(
         vehicle?.image_path || ''
     ).trim();
 
-
     if (!imagePath) {
-
         console.warn(
             'IMAGE_PATH KOSONG:',
             vehicle?.name
@@ -103,19 +95,13 @@ function getVehicleImageUrl(vehicle) {
         return '';
     }
 
-
     try {
 
-        const {
-            data
-        } = sb.storage
+        const { data } = sb.storage
             .from(VEHICLE_IMAGE_BUCKET)
             .getPublicUrl(imagePath);
 
-
-        const url =
-            data?.publicUrl || '';
-
+        const url = data?.publicUrl || '';
 
         console.log(
             'IMAGE:',
@@ -123,7 +109,6 @@ function getVehicleImageUrl(vehicle) {
             '=>',
             imagePath
         );
-
 
         return url;
 
@@ -146,41 +131,42 @@ function getVehicleImageUrl(vehicle) {
 
 function handleVehicleImageError(img) {
 
-    if (!img) {
-        return;
-    }
-
+    if (!img) return;
 
     console.warn(
         'GAMBAR GAGAL DIMUAT:',
         img.src
     );
 
-
     img.style.display = 'none';
 
-
     const placeholder =
-        img.parentElement
-            ?.querySelector(
-                '.vehicle-placeholder'
-            );
-
+        img.parentElement?.querySelector(
+            '.vehicle-placeholder'
+        );
 
     if (placeholder) {
-
-        placeholder.style.display =
-            'flex';
+        placeholder.style.display = 'flex';
     }
 }
 
 
 /* =========================================================
-   FILTER ARMADA VALID
-   HANYA TAMPILKAN YANG:
-   - ACTIVE
-   - PUNYA IMAGE_PATH
+   FILTER ARMADA
    ========================================================= */
+
+/*
+   PENTING:
+
+   Jangan lagi memfilter berdasarkan image_path.
+
+   Kendaraan tanpa gambar tetap ditampilkan.
+   Kendaraan tersebut akan menggunakan placeholder.
+
+   Kita juga tidak membatasi active=true di sini,
+   karena target tampilan Anda adalah seluruh armada
+   yang tersedia di tabel vehicles.
+*/
 
 function filterValidVehicles(list) {
 
@@ -188,20 +174,12 @@ function filterValidVehicles(list) {
         return [];
     }
 
-
     return list.filter(vehicle => {
 
-        const active =
-            vehicle.active === true;
+        return vehicle &&
+            vehicle.id &&
+            vehicle.name;
 
-
-        const imagePath =
-            String(
-                vehicle.image_path || ''
-            ).trim();
-
-
-        return active && imagePath;
     });
 }
 
@@ -223,17 +201,13 @@ function showCars(list) {
     );
 
 
-    const vehicleSelect =
-        getElement('vehicle');
-
-
-    const cars =
-        getElement('cars');
-
-
     /* =====================================================
        DROPDOWN BOOKING
        ===================================================== */
+
+    const vehicleSelect =
+        getElement('vehicle');
+
 
     if (vehicleSelect) {
 
@@ -256,6 +230,7 @@ function showCars(list) {
 
 
             vehicleSelect.appendChild(option);
+
         });
     }
 
@@ -263,6 +238,10 @@ function showCars(list) {
     /* =====================================================
        CONTAINER ARMADA
        ===================================================== */
+
+    const cars =
+        getElement('cars');
+
 
     if (!cars) {
 
@@ -282,14 +261,11 @@ function showCars(list) {
 
         cars.innerHTML = `
             <div class="fleet-empty">
-                <strong>
-                    Armada belum tersedia.
-                </strong>
+                <strong>Armada belum tersedia.</strong>
                 <br>
                 Silakan hubungi Transmind Nusantara.
             </div>
         `;
-
 
         return;
     }
@@ -314,7 +290,7 @@ function showCars(list) {
 
             const capacity =
                 vehicle.capacity ||
-                'Sesuai tipe kendaraan';
+                'Kapasitas sesuai tipe kendaraan';
 
 
             const id =
@@ -342,17 +318,7 @@ function showCars(list) {
                                         src="${escapeHtml(imageUrl)}"
                                         alt="${escapeHtml(name)}"
                                         loading="lazy"
-
-                                        style="
-                                            width:100%;
-                                            height:220px;
-                                            object-fit:cover;
-                                            display:block;
-                                        "
-
-                                        onerror="
-                                            handleVehicleImageError(this);
-                                        "
+                                        onerror="handleVehicleImageError(this)"
                                     >
                                 `
                                 : ''
@@ -361,11 +327,11 @@ function showCars(list) {
 
                         <div
                             class="vehicle-placeholder"
-
                             style="
                                 display:${imageUrl ? 'none' : 'flex'};
                                 width:100%;
-                                height:220px;
+                                height:100%;
+                                min-height:220px;
                                 align-items:center;
                                 justify-content:center;
                                 text-align:center;
@@ -382,23 +348,31 @@ function showCars(list) {
                     </div>
 
 
+                    <!-- =================================
+                         INFORMASI KENDARAAN
+                         ================================= -->
+
                     <div class="ci">
 
                         <b>
-                            ${escapeHtml(category)}
+                            ${escapeHtml(name)}
                         </b>
 
 
-                        <p>
+                        <div class="vehicle-type">
+                            Jenis: ${escapeHtml(category)}
+                        </div>
+
+
+                        <div class="vehicle-capacity">
                             ${escapeHtml(capacity)}
                             • Jabodetabek
-                        </p>
+                        </div>
 
 
                         <button
                             type="button"
                             class="btn gold"
-
                             data-select-vehicle="${escapeHtml(id)}"
                         >
                             PILIH
@@ -463,9 +437,7 @@ function selectVehicle(vehicleId) {
         vehicleId || '';
 
 
-    if (
-        select.value !== vehicleId
-    ) {
+    if (select.value !== vehicleId) {
 
         console.warn(
             'VEHICLE ID TIDAK DITEMUKAN:',
@@ -501,9 +473,7 @@ function updateVehicleInfo(vehicleId) {
         getElement('vehiclePrice');
 
 
-    if (!priceBox) {
-        return;
-    }
+    if (!priceBox) return;
 
 
     if (!vehicleId) {
@@ -543,7 +513,7 @@ function updateVehicleInfo(vehicleId) {
 
 
 /* =========================================================
-   LOAD ARMADA DARI DATABASE
+   LOAD ARMADA DATABASE
    ========================================================= */
 
 async function loadVehicles() {
@@ -618,7 +588,17 @@ async function loadVehicles() {
 
 
         /* =================================================
-           AMBIL ARMADA
+           AMBIL SEMUA ARMADA
+           
+           PERUBAHAN UTAMA:
+           
+           TIDAK ADA:
+           .eq('active', true)
+
+           TIDAK ADA:
+           .not('image_path', 'is', null)
+
+           Jadi kendaraan tanpa gambar tetap masuk.
            ================================================= */
 
         const {
@@ -626,8 +606,7 @@ async function loadVehicles() {
             error
         } = await sb
             .from('vehicles')
-            .select(
-                `
+            .select(`
                 id,
                 name,
                 slug,
@@ -636,21 +615,12 @@ async function loadVehicles() {
                 active,
                 sort_order,
                 image_path
-                `
-            )
-            .eq(
-                'active',
-                true
-            )
-            .not(
-                'image_path',
-                'is',
-                null
-            )
+            `)
             .order(
                 'sort_order',
                 {
-                    ascending: true
+                    ascending: true,
+                    nullsFirst: false
                 }
             )
             .order(
@@ -668,7 +638,6 @@ async function loadVehicles() {
                 error
             );
 
-
             throw error;
         }
 
@@ -681,7 +650,7 @@ async function loadVehicles() {
 
 
         /* =================================================
-           FILTER IMAGE_PATH KOSONG
+           FILTER DASAR
            ================================================= */
 
         const validVehicles =
@@ -689,9 +658,8 @@ async function loadVehicles() {
 
 
         console.log(
-            'ARMADA DENGAN GAMBAR VALID:',
-            validVehicles.length,
-            validVehicles
+            'TOTAL ARMADA SIAP DITAMPILKAN:',
+            validVehicles.length
         );
 
 
@@ -709,10 +677,9 @@ async function loadVehicles() {
         if (!validVehicles.length) {
 
             setFleetStatus(
-                'Belum ada armada yang memiliki gambar.',
+                'Belum ada armada.',
                 'warning'
             );
-
 
             return;
         }
@@ -881,10 +848,7 @@ function validateBooking(
     }
 
 
-    if (
-        !data.start ||
-        !data.end
-    ) {
+    if (!data.start || !data.end) {
 
         resultBox.textContent =
             'Tanggal booking wajib diisi.';
@@ -893,9 +857,7 @@ function validateBooking(
     }
 
 
-    if (
-        data.end < data.start
-    ) {
+    if (data.end < data.start) {
 
         resultBox.textContent =
             'Tanggal selesai tidak boleh sebelum tanggal mulai.';
@@ -1033,32 +995,17 @@ async function submitBooking(event) {
         getElement('result');
 
 
-    if (!resultBox) {
-        return;
-    }
+    if (!resultBox) return;
 
 
     const data =
         getFormData();
 
 
-    /* =====================================================
-       VALIDASI
-       ===================================================== */
-
-    if (
-        !validateBooking(
-            data,
-            resultBox
-        )
-    ) {
+    if (!validateBooking(data, resultBox)) {
         return;
     }
 
-
-    /* =====================================================
-       CEK DATABASE
-       ===================================================== */
 
     if (!sb) {
 
@@ -1080,10 +1027,6 @@ async function submitBooking(event) {
             data
         );
 
-
-        /* =================================================
-           RPC CREATE BOOKING
-           ================================================= */
 
         const {
             data: rpcData,
@@ -1220,10 +1163,6 @@ async function submitBooking(event) {
         `;
 
 
-        /* =================================================
-           WHATSAPP
-           ================================================= */
-
         setTimeout(() => {
 
             openSuccessWhatsApp(
@@ -1233,10 +1172,6 @@ async function submitBooking(event) {
 
         }, 800);
 
-
-        /* =================================================
-           RESET FORM
-           ================================================= */
 
         setTimeout(() => {
 
@@ -1248,7 +1183,6 @@ async function submitBooking(event) {
 
 
             if (vehicleSelect) {
-
                 vehicleSelect.selectedIndex = 0;
             }
 
@@ -1282,10 +1216,6 @@ async function submitBooking(event) {
 
 function setupEvents() {
 
-    /* =====================================================
-       FORM BOOKING
-       ===================================================== */
-
     const form =
         getElement('bookingForm');
 
@@ -1298,10 +1228,6 @@ function setupEvents() {
         );
     }
 
-
-    /* =====================================================
-       DROPDOWN KENDARAAN
-       ===================================================== */
 
     const vehicle =
         getElement('vehicle');
@@ -1322,10 +1248,6 @@ function setupEvents() {
     }
 
 
-    /* =====================================================
-       TANGGAL
-       ===================================================== */
-
     const start =
         getElement('start');
 
@@ -1341,23 +1263,16 @@ function setupEvents() {
 
 
     if (start) {
-
-        start.min =
-            today;
+        start.min = today;
     }
 
 
     if (end) {
-
-        end.min =
-            today;
+        end.min = today;
     }
 
 
-    if (
-        start &&
-        end
-    ) {
+    if (start && end) {
 
         start.addEventListener(
             'change',
@@ -1423,7 +1338,6 @@ async function init() {
 
 /* =========================================================
    GLOBAL FUNCTION
-   PENTING UNTUK ONERROR HTML
    ========================================================= */
 
 window.handleVehicleImageError =
