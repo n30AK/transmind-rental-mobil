@@ -129,3 +129,29 @@
     }
 
 }
+/* =========================================================
+   ARMADA - NAMA & JENIS KENDARAAN
+   ========================================================= */
+
+.car .ci h3 {
+    margin: 8px 0 6px;
+    color: #ffffff;
+    font-size: 17px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.car .ci > b {
+    display: block;
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.car .ci p {
+    margin: 0 0 16px;
+    color: #999;
+    font-size: 11px;
+    line-height: 1.6;
+}
