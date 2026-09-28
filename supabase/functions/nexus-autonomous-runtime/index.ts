@@ -129,6 +129,40 @@ Deno.serve(async (req) => {
     const finishedAt = new Date();
     const status = anomalies.length === 0 && !failedAfterRetest ? "PASS" : "ANOMALY";
 
+    // Close the loop: every planned action is explicitly verified after retest.
+    if (anomalies.length > 0) {
+      for (const anomaly of anomalies) {
+        const persisted = await rest(
+          "nexus_incidents?select=id,state&incident_key=eq." + encodeURIComponent(String(anomaly.incident_key)) +
+          "&state=in.(OPEN,ACKNOWLEDGED)&limit=1"
+        );
+        const incidentId = persisted?.[0]?.id ?? null;
+        if (incidentId) {
+          const persistent = failedAfterRetest;
+          await patch("nexus_incidents", "id=eq." + encodeURIComponent(String(incidentId)), {
+            state: persistent ? "ESCALATED" : "RESOLVED",
+            resolved_at: persistent ? null : finishedAt.toISOString(),
+            evidence: { initial: anomaly.evidence, retest, persistent },
+          });
+          await patch(
+            "nexus_actions",
+            "incident_id=eq." + encodeURIComponent(String(incidentId)) + "&execution_state=eq.PLANNED",
+            {
+              execution_state: persistent ? "VERIFIED_ESCALATION" : "VERIFIED",
+              result: {
+                mutation: false,
+                retest_passed: !persistent,
+                escalated: persistent,
+                verified_at: finishedAt.toISOString(),
+              },
+              executed_at: finishedAt.toISOString(),
+              verified_at: finishedAt.toISOString(),
+            }
+          );
+        }
+      }
+    }
+
     await patch("nexus_runtime_runs", "run_id=eq." + encodeURIComponent(runId), {
       finished_at: finishedAt.toISOString(),
       status,
