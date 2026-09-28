@@ -1,0 +1,36 @@
+name: NEXUS Autonomous Runtime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      trigger:
+        description: "Runtime trigger label"
+        required: false
+        default: "MANUAL"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-autonomous-runtime
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wake NEXUS
+        env:
+          RUNTIME_URL: ${{ secrets.NEXUS_RUNTIME_URL }}
+          RUNTIME_SECRET: ${{ secrets.NEXUS_RUNTIME_SECRET }}
+          TRIGGER: ${{ github.event.inputs.trigger || 'SCHEDULED' }}
+        run: |
+          set -euo pipefail
+          test -n "$RUNTIME_URL"
+          test -n "$RUNTIME_SECRET"
+          response="$(curl --fail-with-body --silent --show-error --max-time 90 -X POST "$RUNTIME_URL"             -H "content-type: application/json"             -H "x-nexus-runtime-secret: $RUNTIME_SECRET"             -H "x-nexus-trigger: $TRIGGER"             -d '{"mode":"autonomous"}')"
+          echo "$response" | python -m json.tool
+          echo "$response" | python -c 'import json,sys; x=json.load(sys.stdin); assert x.get("heartbeat") == "ALIVE", x; assert x.get("run_id"), x; print("NEXUS HEARTBEAT:", x["run_id"], x["status"])'
