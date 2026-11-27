@@ -1,0 +1,27 @@
+name: NEXUS Runtime Validation
+
+on:
+  pull_request:
+    paths:
+      - "supabase/functions/nexus-autonomous-runtime/**"
+      - "supabase/migrations/20260928_nexus_autonomous_runtime_v1.sql"
+      - ".github/workflows/nexus-autonomous-runtime.yml"
+      - ".github/workflows/nexus-runtime-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-edge-function:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check Edge Function
+        run: deno check supabase/functions/nexus-autonomous-runtime/index.ts
+      - name: Format check
+        run: deno fmt --check supabase/functions/nexus-autonomous-runtime/index.ts
